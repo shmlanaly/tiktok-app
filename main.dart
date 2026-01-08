@@ -72,7 +72,7 @@ class VideoScrollFeed extends StatefulWidget {
 
 class _VideoScrollFeedState extends State<VideoScrollFeed> {
   // ✅ رابط السيرفر الذي نتحكم به
-  final String api = "https://tiktok-backend-production-a0aa.up.railway.app/feed";
+  final String api = "https://practical-perle-yemen-3ec5b706.koyeb.app/feed";
   List items = [];
   bool loading = true;
 
