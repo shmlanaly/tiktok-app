@@ -3,82 +3,111 @@ import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-void main() { runApp(const MyApp()); }
+void main() => runApp(const InstagramVideoApp());
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class InstagramVideoApp extends StatelessWidget {
+  const InstagramVideoApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TikTok Clone',
       theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: Colors.black),
-      home: const VideoFeedScreen(),
+      home: const MainScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class VideoFeedScreen extends StatefulWidget {
-  const VideoFeedScreen({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
   @override
-  State<VideoFeedScreen> createState() => _VideoFeedScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-class _VideoFeedScreenState extends State<VideoFeedScreen> {
-  final String serverUrl = "https://tiktok-backend-production-a0aa.up.railway.app/feed";
-  List<dynamic> videos = [];
-  bool isLoading = true;
-
-  @override
-  void initState() { super.initState(); fetchVideos(); }
-
-  Future<void> fetchVideos() async {
-    try {
-      final response = await http.get(Uri.parse(serverUrl));
-      if (response.statusCode == 200) {
-        setState(() { videos = json.decode(response.body); isLoading = false; });
-      }
-    } catch (e) { print("Error: $e"); }
-  }
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+  final List<Widget> _pages = [const VideoFeed(), const Center(child: Text("Search")), const Center(child: Text("Profile"))];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isLoading ? const Center(child: CircularProgressIndicator()) : PageView.builder(
-        scrollDirection: Axis.vertical,
-        itemCount: videos.length,
-        itemBuilder: (context, index) => VideoItem(
-          url: videos[index]['url'],
-          username: videos[index]['username'] ?? 'User',
-          description: videos[index]['description'] ?? '',
-          likes: (videos[index]['likes'] ?? 0).toString(),
-        ),
+      appBar: _selectedIndex == 0 ? AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text("Instagram Video", style: TextStyle(fontFamily: 'Billabong', fontSize: 28)),
+        actions: [IconButton(icon: const Icon(Icons.send_rounded), onPressed: () {})],
+      ) : null,
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (i) => setState(() => _selectedIndex = i),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
+        ],
       ),
     );
   }
 }
 
-class VideoItem extends StatefulWidget {
-  final String url, username, description, likes;
-  const VideoItem({super.key, required this.url, required this.username, required this.description, required this.likes});
+class VideoFeed extends StatefulWidget {
+  const VideoFeed({super.key});
   @override
-  State<VideoItem> createState() => _VideoItemState();
+  State<VideoFeed> createState() => _VideoFeedState();
 }
 
-class _VideoItemState extends State<VideoItem> {
-  late VideoPlayerController _controller;
-  bool _initialized = false;
+class _VideoFeedState extends State<VideoFeed> {
+  final String url = "https://tiktok-backend-production-a0aa.up.railway.app/feed";
+  List videos = [];
+  bool loading = true;
+
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))..initialize().then((_) {
-      setState(() { _initialized = true; _controller.play(); _controller.setLooping(true); });
+    http.get(Uri.parse(url)).then((res) {
+      if (res.statusCode == 200) setState(() { videos = json.decode(res.body); loading = false; });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (loading) return const Center(child: CircularProgressIndicator());
+    return PageView.builder(
+      scrollDirection: Axis.vertical,
+      itemCount: videos.length,
+      itemBuilder: (context, i) => VideoStack(url: videos[i]['url'], user: videos[i]['username']),
+    );
+  }
+}
+
+class VideoStack extends StatefulWidget {
+  final String url, user;
+  const VideoStack({super.key, required this.url, required this.user});
+  @override
+  State<VideoStack> createState() => _VideoStackState();
+}
+
+class _VideoStackState extends State<VideoStack> {
+  late VideoPlayerController _c;
+  @override
+  void initState() {
+    super.initState();
+    _c = VideoPlayerController.networkUrl(Uri.parse(widget.url))..initialize().then((_) {
+      setState(() {});
+      _c.play();
+      _c.setLooping(true);
     });
   }
   @override
-  void dispose() { _controller.dispose(); super.dispose(); }
+  void dispose() { _c.dispose(); super.dispose(); }
   @override
   Widget build(BuildContext context) {
-    return _initialized ? VideoPlayer(_controller) : const Center(child: CircularProgressIndicator());
+    return Stack(
+      children: [
+        _c.value.isInitialized ? SizedBox.expand(child: VideoPlayer(_c)) : const Center(child: CircularProgressIndicator()),
+        Positioned(bottom: 20, left: 10, child: Text("@${widget.user}", style: const TextStyle(fontWeight: FontWeight.bold))),
+        const Positioned(right: 10, bottom: 100, child: Column(children: [Icon(Icons.favorite_border, size: 35), SizedBox(height: 20), Icon(Icons.chat_bubble_outline, size: 35)]))
+      ],
+    );
   }
 }
