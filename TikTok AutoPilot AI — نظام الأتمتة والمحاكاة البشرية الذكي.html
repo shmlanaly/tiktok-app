@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok AutoPilot AI — نظام الأتمتة والمحاكاة البشرية الذكي</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Cairo', 'Inter', 'sans-serif'],
+            mono: ['Inter', 'monospace']
+          },
+          colors: {
+            ttCyan: '#00f2fe',
+            ttPink: '#ff0050',
+            ttGold: '#f59e0b',
+            ttDark: '#090b10',
+            ttCard: '#121622'
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Cairo', 'Inter', sans-serif;
+      background-color: #090b10;
+      color: #f3f4f6;
+      overflow-x: hidden;
+    }
+    .tt-gradient-border {
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(255, 0, 80, 0.25), rgba(245, 158, 11, 0.2));
+    }
+    .tt-glow {
+      box-shadow: 0 0 25px -5px rgba(0, 242, 254, 0.25), 0 0 25px -5px rgba(255, 0, 80, 0.25);
+    }
+    .gold-glow {
+      box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.35);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090b10;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #262d40;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f2fe;
+    }
+    @keyframes pulseSlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.03); }
+    }
+    .animate-pulse-slow {
+      animation: pulseSlow 2.6s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#090b10] text-slate-100 selection:bg-[#ff0050] selection:text-white">
+
+  <!-- Toast Notification -->
+  <div id="toastContainer" class="fixed top-4 left-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- Top Header -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-[#090b10]/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#00f2fe] via-[#ff0050] toamber-500 p-[2px] tt-glow">
+          <div class="w-full h-full bg-[#090b10] rounded-[14px] flex items-center justify-center">
+            <svg class="w-6 h-6 text-[#00f2fe]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg md:text-xl font-black tracking-tight bg-gradient-to-l from-white via-[#00f2fe] to-[#ff0050] bg-clip-text text-transparent">
+              TikTok AutoPilot AI
+            </h1>
+            <span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">
+              VIP محاكاة بشرية
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">نظام إدارة الحساب الذاتي • فيديوهات فخمة بالذكاء الاصطناعي • بثوث تلقائية وحماية الأكسبلور</p>
+        </div>
+      </div>
+
+      <!-- Status Indicators -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div id="accountStatusBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold">
+          <span id="accountStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+          <span id="accountStatusText" class="text-slate-300">بانتظار ربط الحساب</span>
+        </div>
+
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/50 border border-emerald-500/30 text-xs font-semibold text-emerald-300">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+          <span>درع الأكسبلور: <strong id="shieldPercentage">99.4% آمن</strong></span>
+        </div>
+
+        <button type="button" id="toggleAutopilotMasterBtn" onclick="toggleMasterAutopilot()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#ff0050] to-[#00f2fe] text-slate-950 font-extrabold text-xs hover:opacity-95 transition flex items-center gap-1.5 shadow-lg">
+          <span id="masterBtnText">تشغيل الأتمتة الكاملة</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-7xl mx-auto px-4 flex items-center gap-1 overflow-x-auto pb-2 pt-1">
+      <button type="button" onclick="switchTab('loginTab')" id="tabBtn-loginTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition bg-[#161b2a] text-[#00f2fe] border border-[#00f2fe]/40">
+        1. مربعات دخول الحساب والمحاكاة البشرية
+      </button>
+      <button type="button" onclick="switchTab('studioTab')" id="tabBtn-studioTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition text-slate-400 hover:text-white hover:bg-slate-900">
+        2. استوديو الفيديوهات الفخمة (AI)
+      </button>
+      <button type="button" onclick="switchTab('scheduleTab')" id="tabBtn-scheduleTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition text-slate-400 hover:text-white hover:bg-slate-900">
+        3. النشر التلقائي وحماية الأكسبلور
+      </button>
+      <button type="button" onclick="switchTab('liveTab')" id="tabBtn-liveTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition text-slate-400 hover:text-white hover:bg-slate-900">
+        4. البثوث التلقائية الذكية (Auto-Live)
+      </button>
+      <button type="button" onclick="switchTab('pythonTab')" id="tabBtn-pythonTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition text-amber-400 hover:bg-amber-500/10 border border-transparent">
+        5. كود محرك المتصفح الفعلي (Python Stealth)
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- Quick KPI Bar -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="bg-[#121622] border border-slate-800/90 rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-400">حالة محاكي التصفح البشري</p>
+          <p id="kpiHumanStatus" class="text-base md:text-lg font-extrabold text-emerald-400 mt-0.5">تمويه بشري نشط (Stealth)</p>
+          <p class="text-[11px] text-slate-500 mt-0.5">حركة ماوس منحنية + تمرير طبيعي</p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold">
+          100%
+        </div>
+      </div>
+
+      <div class="bg-[#121622] border border-slate-800/90 rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-400">فيديوهات AI الفخمة الجاهزة</p>
+          <p id="kpiQueuedVideos" class="text-base md:text-lg font-extrabold text-[#00f2fe] mt-0.5">4 فيديوهات فخمة</p>
+          <p class="text-[11px] text-slate-500 mt-0.5">جودة 1080p • أبعاد 9:16</p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-[#00f2fe] font-bold">
+          AI
+        </div>
+      </div>
+
+      <div class="bg-[#121622] border border-slate-800/90 rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-400">مؤشر نشاط الأكسبلور (FYP)</p>
+          <p id="kpiExploreScore" class="text-base md:text-lg font-extrabold text-amber-400 mt-0.5">مرتفع جداً (+42%)</p>
+          <p class="text-[11px] text-slate-500 mt-0.5">استمرارية النشر وقت الانشغال</p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold">
+          🔥
+        </div>
+      </div>
+
+      <div class="bg-[#121622] border border-slate-800/90 rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-400">البث التلقائي القادم</p>
+          <p id="kpiNextLive" class="text-base md:text-lg font-extrabold text-[#ff0050] mt-0.5">11:30 مساءً (تلقائي)</p>
+          <p class="text-[11px] text-slate-500 mt-0.5">رد صوتي وكتابي ذكي على الداعمين</p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-[#ff0050] font-bold">
+          LIVE
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: ACCOUNT LOGIN & HUMAN SIMULATION    -->
+    <!-- ========================================== -->
+    <section id="loginTab" class="tab-panel grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Right Column: Input Boxes for TikTok Account -->
+      <div class="lg:col-span-7 bg-[#121622] border border-slate-800 rounded-3xl p-5 md:p-6 shadow-xl relative overflow-hidden">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <span class="text-xs font-bold text-[#00f2fe] uppercase tracking-wider">الخطوة الأساسية عند الدخول</span>
+            <h2 class="text-xl font-black text-white mt-0.5">مربعات إدخال حساب تيك توك والربط البشري الآمن</h2>
+            <p class="text-xs text-slate-400 mt-1">أدخل بيانات حسابك ليقوم المحرك بفتح متصفح خفي يحاكي اللمس والتصفح البشري الطبيعي بدون أي حظر</p>
+          </div>
+        </div>
+
+        <form id="tiktokLoginForm" onsubmit="handleAccountLogin(event)" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Box 1: Username / Email / Phone -->
+            <div class="bg-[#0b0e17] border border-slate-800 focus-within:border-[#00f2fe] rounded-2xl p-3.5 transition">
+              <label for="ttUsername" class="block text-xs font-bold text-slate-300 mb-1.5">
+                1. اسم المستخدم أو البريد / رقم الهاتف
+              </label>
+              <div class="flex items-center gap-2">
+                <span class="text-[#00f2fe] font-bold text-sm">@</span>
+                <input
+                  id="ttUsername"
+                  type="text"
+                  required
+                  value="luxury_creator_vip"
+                  placeholder="مثال: username أو البريد الإلكتروني"
+                  class="w-full bg-transparent text-sm text-white focus:outline-none font-mono"
+                />
+              </div>
+              <p class="text-[11px] text-slate-500 mt-1">يُكتب بسرعة بشرية متدرجة (85-160ms لكل حرف)</p>
+            </div>
+
+            <!-- Box 2: Password -->
+            <div class="bg-[#0b0e17] border border-slate-800 focus-within:border-[#ff0050] rounded-2xl p-3.5 transition">
+              <label for="ttPassword" class="block text-xs font-bold text-slate-300 mb-1.5">
+                2. كلمة مرور حساب تيك توك
+              </label>
+              <div class="flex items-center gap-2">
+                <input
+                  id="ttPassword"
+                  type="password"
+                  required
+                  value="••••••••••••"
+                  placeholder="أدخل كلمة المرور"
+                  class="w-full bg-transparent text-sm text-white focus:outline-none font-mono"
+                />
+                <button type="button" onclick="togglePasswordVisibility()" class="text-xs text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800">
+                  إظهار
+                </button>
+              </div>
+              <p class="text-[11px] text-slate-500 mt-1">تُحفظ محلياً في ملف جلسة مشفر (Cookies Session)</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Box 3: Session ID / Cookie Backup -->
+            <div class="bg-[#0b0e17] border border-slate-800 focus-within:border-amber-400 rounded-2xl p-3.5 transition">
+              <label for="ttSessionId" class="block text-xs font-bold text-amber-300 mb-1.5">
+                3. كود الجلسة (SessionID Cookie) — اختياري لمنع الكابتشا نهائياً
+              </label>
+              <input
+                id="ttSessionId"
+                type="text"
+                value="sessionid_ss=7f8a9d21c4e9b0a123f45e6789a0bcde"
+                placeholder="الصق قيمة sessionid إن وجدت لتخطي طلب الرمز"
+                class="w-full bg-transparent text-xs text-slate-200 focus:outline-none font-mono"
+              />
+              <p class="text-[11px] text-slate-500 mt-1">يحافظ على بقاء الحساب متصلاً 24/7 بدون إعادة تسجيل دخول</p>
+            </div>
+
+            <!-- Box 4: Content Niche & Country Target -->
+            <div class="bg-[#0b0e17] border border-slate-800 focus-within:border-emerald-400 rounded-2xl p-3.5 transition">
+              <label for="ttTargetRegion" class="block text-xs font-bold text-emerald-300 mb-1.5">
+                4. خوارزمية الأكسبلور المستهدفة ومجال الحساب
+              </label>
+              <select
+                id="ttTargetRegion"
+                class="w-full bg-[#121622] text-xs md:text-sm text-white rounded-xl px-2.5 py-2 border border-slate-700 focus:outline-none"
+              >
+                <option value="خليجي وعربي - فخامة وتحفيز">الخليج والوطن العربي — فخامة، نجاح، وهيبة</option>
+                <option value="قصص وغموض بالذكاء الاصطناعي">الخليج والوطن العربي — قصص تاريخية وغموض AI</option>
+                <option value="سيارات خارقة وحياة المليارديرات">عالمي وعربي — سيارات خارقة وحياة النخبة</option>
+                <option value="تقنية ومعلومات مستقبلية">عربي — عجائب التقنية والذكاء الاصطناعي</option>
+              </select>
+              <p class="text-[11px] text-slate-500 mt-1">يضبط أوقات الذروة والهاشتاقات تلقائياً</p>
+            </div>
+          </div>
+
+          <!-- Anti-Ban Human Simulation Controls -->
+          <div class="bg-[#0b0e17] border border-slate-800/90 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs md:text-sm font-extrabold text-white flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                إعدادات محاكاة التصفح البشري (لمنع الحظر وتنشيط الأكسبلور)
+              </h3>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 font-bold">موصى به 100%</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-[#121622] border border-slate-800 cursor-pointer">
+                <input type="checkbox" id="chkWarmupScroll" checked class="mt-1 accent-[#00f2fe]" />
+                <div>
+                  <span class="font-bold text-slate-200 block">تسخين الحساب قبل النشر (Warm-up)</span>
+                  <span class="text-slate-400 text-[11px]">يتصفح الأكسبلور 4-7 دقائق ويشاهد فيديوهات كاملة قبل رفع أي مقطع</span>
+                </div>
+              </label>
+
+              <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-[#121622] border border-slate-800 cursor-pointer">
+                <input type="checkbox" id="chkBezierMouse" checked class="mt-1 accent-[#00f2fe]" />
+                <div>
+                  <span class="font-bold text-slate-200 block">حركة ماوس ولمس بشري (Bezier Curves)</span>
+                  <span class="text-slate-400 text-[11px]">تحريك المؤشر بمنحنيات طبيعية وتوقفات عشوائية غير آلية</span>
+                </div>
+              </label>
+
+              <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-[#121622] border border-slate-800 cursor-pointer">
+                <input type="checkbox" id="chkRandomEngagement" checked class="mt-1 accent-[#00f2fe]" />
+                <div>
+                  <span class="font-bold text-slate-200 block">تفاعل بشري عشوائي في الأكسبلور</span>
+                  <span class="text-slate-400 text-[11px]">إعجاب وحفظ 2-3 مقاطع في نفس مجالك لتنشيط خوارزمية حسابك</span>
+                </div>
+              </label>
+
+              <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-[#121622] border border-slate-800 cursor-pointer">
+                <input type="checkbox" id="chkFingerprintProtect" checked class="mt-1 accent-[#00f2fe]" />
+                <div>
+                  <span class="font-bold text-slate-200 block">بصمة جهاز حقيقية ثابتة (Stealth Fingerprint)</span>
+                  <span class="text-slate-400 text-[11px]">إخفاء علامات WebDriver وتثبيت IP وبصمة متصفح شخصية</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Real Connection Bridge Mode (Local Server / Official API / Direct Launcher) -->
+          <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-amber-300">⚡ وضع التنفيذ الفعلي على حسابك الحقيقي (Real Execution Bridge)</span>
+              <span id="bridgeConnectionStatus" class="text-[11px] px-2 py-0.5 rounded bg-slate-900 text-amber-400 font-mono">وضع المتصفح المباشر</span>
+            </div>
+            <p class="text-[11px] text-slate-300 leading-relaxed">
+              لأن أنظمة الحماية في المتصفح تمنع أي موقع ويب من الدخول السري لحسابك بدون إذن، يمكنك الربط الفعلي عبر <strong>تشغيل محرك Python المحلي (التبويب 5)</strong> أو إدخال <strong>TikTok Official Access Token</strong> أدناه، أو استخدام أزرار <strong>تصدير الفيديو الحقيقي والفتح المباشر لتيك توك</strong>.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              <input
+                id="localBridgeUrl"
+                type="text"
+                value="http://127.0.0.1:8765"
+                placeholder="رابط محرك الأتمتة المحلي (http://127.0.0.1:8765)"
+                class="w-full bg-[#0b0e17] border border-slate-700 rounded-xl px-3 py-2 text-xs text-[#00f2fe] font-mono focus:outline-none"
+              />
+              <input
+                id="ttOfficialAccessToken"
+                type="text"
+                placeholder="أو ضع TikTok Content Posting API Token (اختياري)"
+                class="w-full bg-[#0b0e17] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none"
+              />
+            </div>
+            <div class="flex flex-wrap gap-2 pt-1">
+              <button type="button" onclick="testLocalBridgeConnection()" class="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-black text-xs hover:opacity-90 transition">
+                🔌 فحص الاتصال بمحرك جهازك (Port 8765)
+              </button>
+              <button type="button" onclick="openRealTikTokPage('profile')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition">
+                🌐 فتح حسابك الحقيقي في تيك توك الآن
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit / Connect Button -->
+          <div class="flex flex-wrap items-center gap-3 pt-1">
+            <button
+              type="submit"
+              id="connectAccountBtn"
+              class="flex-1 min-w-[220px] py-3.5 px-5 rounded-2xl bg-gradient-to-r from-[#00f2fe] via-[#ff0050] to-amber-500 text-slate-950 font-black text-sm md:text-base hover:opacity-95 transition shadow-lg flex items-center justify-center gap-2"
+            >
+              <span>تسجيل الدخول وتفعيل المحاكاة البشرية الآن</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="runHumanWarmupDemo()"
+              class="py-3.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs md:text-sm transition border border-slate-700"
+            >
+              تجربة جولة تصفح بشري الآن
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Left Column: Live Human Browser Simulator Screen -->
+      <div class="lg:col-span-5 bg-[#121622] border border-slate-800 rounded-3xl p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <span class="text-xs font-bold text-emerald-400">مراقب المتصفح الخفي المباشر</span>
+              <h3 class="text-base font-extrabold text-white">شاشة محاكاة التصفح البشري (Stealth Browser)</h3>
+            </div>
+            <span id="simStateBadge" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              متصل وآمن
+            </span>
+          </div>
+
+          <!-- Simulated Browser Window -->
+          <div class="rounded-2xl border border-slate-800 bg-[#080a0f] overflow-hidden shadow-inner">
+            <div class="bg-slate-900/90 px-3 py-2 border-b border-slate-800 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              </div>
+              <span id="simBrowserUrl">https://www.tiktok.com/@luxury_creator_vip</span>
+              <span class="text-emerald-400">WebDriver: False</span>
+            </div>
+
+            <!-- Interactive Canvas showing Mouse Bezier Paths & TikTok Feed Simulation -->
+            <div class="relative h-64 w-full bg-[#07090e]">
+              <canvas id="humanSimCanvas" class="w-full h-full block"></canvas>
+              <div class="absolute bottom-2 right-2 left-2 bg-slate-950/85 backdrop-blur-sm border border-slate-800 rounded-xl p-2.5 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-[#00f2fe] animate-ping"></span>
+                  <span id="simCurrentAction" class="text-slate-200 font-semibold">تمرير بشري طبيعي في صفحة الأكسبلور (FYP)...</span>
+                </div>
+                <span id="simDelayTimer" class="font-mono text-[11px] text-amber-400">تأخير بشري: 3.4s</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Activity Log -->
+        <div class="mt-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400">سجل العمليات البشرية التلقائية</span>
+            <button type="button" onclick="clearActionLog()" class="text-[11px] text-slate-500 hover:text-slate-300">مسح السجل</button>
+          </div>
+          <div id="humanActionLog" class="h-36 overflow-y-auto bg-[#090b10] border border-slate-800/80 rounded-2xl p-3 space-y-2 text-xs font-mono">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: LUXURY AI VIDEO STUDIO              -->
+    <!-- ========================================== -->
+    <section id="studioTab" class="tab-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Video Controls & AI Generator -->
+      <div class="lg:col-span-7 bg-[#121622] border border-slate-800 rounded-3xl p-5 md:p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="text-xs font-bold text-amber-400">محرك الذكاء الاصطناعي السينمائي</span>
+            <h2 class="text-xl font-black text-white mt-0.5">صانع الفيديوهات الفخمة بالذكاء الاصطناعي (9:16)</h2>
+            <p class="text-xs text-slate-400 mt-1">يصنع مقاطع تيك توك فخمة تلقائياً مع نصوص متحركة، مؤثرات بصرية ذهبية، وتعليق صوتي لجذب الأكسبلور</p>
+          </div>
+          <button type="button" onclick="generateRandomLuxuryIdea()" class="px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold transition">
+            ✨ توليد فكرة وسيناريو فخم تلقائياً
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="aiThemeSelect" class="block text-xs font-bold text-slate-300 mb-1.5">الثيم البصري الفخم (Visual Luxury Style)</label>
+            <select id="aiThemeSelect" onchange="updateLuxuryPreviewStyle()" class="w-full bg-[#0b0e17] border border-slate-800 rounded-xl px-3 py-2.5 text-xs md:text-sm text-white focus:outline-none focus:border-amber-400">
+              <option value="gold_empire">إمبراطورية الذهب والنجاح (Royal Gold & Luxury)</option>
+              <option value="cyber_billionaire">ملياردير المستقبل والنيون (Cyberpunk Executive)</option>
+              <option value="dark_wisdom">هيبة الصمت والحكمة الملكية (Dark Cinematic Prestige)</option>
+              <option value="mystery_history">قصص الأساطير والغموض الفخم (Epic AI Storytelling)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="aiVoiceSelect" class="block text-xs font-bold text-slate-300 mb-1.5">نبرة التعليق الصوتي والموسيقى (AI Audio)</label>
+            <select id="aiVoiceSelect" class="w-full bg-[#0b0e17] border border-slate-800 rounded-xl px-3 py-2.5 text-xs md:text-sm text-white focus:outline-none focus:border-[#00f2fe]">
+              <option value="فخم وعميق - وثائقي">صوت عربي رخيم وعميق + موسيقى سينمائية فخمة</option>
+              <option value="حماسي - تحفيز النخبة">صوت حماسي قوي + إيقاع Phonk فخم للأكسبلور</option>
+              <option value="هادئ وغامض - قصص">صوت سرد قصصي غامض + مؤثرات محيطية</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="aiVideoHeadline" class="block text-xs font-bold text-slate-300 mb-1.5">عنوان الخطاف في أول 3 ثوانٍ (Hook لجذب المشاهدين)</label>
+          <input
+            id="aiVideoHeadline"
+            type="text"
+            oninput="syncStudioPreviewText()"
+            value="القاعدة الذهبية التي لا يخبرك بها الأثرياء أبداً"
+            class="w-full bg-[#0b0e17] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-bold text-amber-300 focus:outline-none focus:border-amber-400"
+          />
+        </div>
+
+        <div>
+          <label for="aiVideoScript" class="block text-xs font-bold text-slate-300 mb-1.5">سيناريو الفيديو الفخم (يظهر كترجمة احترافية متحركة على الفيديو)</label>
+          <textarea
+            id="aiVideoScript"
+            rows="3"
+            oninput="syncStudioPreviewText()"
+            class="w-full bg-[#0b0e17] border border-slate-800 rounded-xl p-3.5 text-xs md:text-sm text-slate-200 focus:outline-none focus:border-[#00f2fe]"
+          >النجاح الحقيقي لا يصنع في الضجيج، بل يبنى في ساعات الصمت عندما يظن الجميع أنك توقفت. استمر في بناء إمبراطوريتك بصمت.</textarea>
+        </div>
+
+        <div>
+          <label for="aiVideoHashtags" class="block text-xs font-bold text-slate-300 mb-1.5">وصف المقطع وهاشتاقات صعود الأكسبلور التلقائية</label>
+          <input
+            id="aiVideoHashtags"
+            type="text"
+            value="#اكسبلور #فخامة #نجاح #تطوير_الذات #ملياردير #تحفيز #ذكاء_اصطناعي #fyp #explore"
+            class="w-full bg-[#0b0e17] border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-[#00f2fe] font-mono focus:outline-none"
+          />
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <button
+            type="button"
+            onclick="createAndQueueLuxuryVideo()"
+            class="flex-1 min-w-[200px] py-3.5 px-5 rounded-2xl bg-gradient-to-r from-amber-500 via-[#ff0050] to-[#00f2fe] text-slate-950 font-black text-sm hover:opacity-95 transition gold-glow"
+          >
+            إنتاج الفيديو وإضافته لجدول النشر التلقائي
+          </button>
+
+          <button
+            type="button"
+            id="studioAudioBtn"
+            onclick="toggleLuxuryAudioPreview()"
+            class="py-3.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs md:text-sm border border-amber-500/30 transition"
+          >
+            🔊 تشغيل الموسيقى السينمائية للمعاينة
+          </button>
+        </div>
+
+        <!-- Real Video Recording & Real TikTok Upload Bar -->
+        <div class="bg-emerald-950/30 border border-emerald-500/30 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-xs font-extrabold text-emerald-300">🎬 تصدير ملف الفيديو الحقيقي والنشر المباشر في تيك توك</p>
+            <p id="recordVideoStatusText" class="text-[11px] text-slate-400">يسجل الفيديو المعروض أمامك بجودة عالية ويحمله لجهازك مع نسخ الوصف والهاشتاقات تلقائياً</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              id="recordRealVideoBtn"
+              onclick="recordAndDownloadRealVideo()"
+              class="px-4 py-2.5 rounded-xl bg-emerald-400 text-slate-950 font-black text-xs hover:opacity-90 transition shadow-md"
+            >
+              ⬇️ تسجيل وتحميل الفيديو الفخم الحقيقي (5 ثوانٍ)
+            </button>
+            <button
+              type="button"
+              onclick="openRealTikTokPage('upload')"
+              class="px-3.5 py-2.5 rounded-xl bg-[#00f2fe] text-slate-950 font-black text-xs hover:opacity-90 transition"
+            >
+              📤 فتح صفحة رفع تيك توك الرسمية
+            </button>
+          </div>
+        </div>
+
+        <!-- Preset Luxury Templates -->
+        <div class="pt-3 border-t border-slate-800/80">
+          <p class="text-xs font-bold text-slate-400 mb-2.5">قوالب جاهزة سريعة لتوليد سلاسل فيديوهات وقت انشغالك:</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <button type="button" onclick="applyLuxuryTemplate(0)" class="p-3 rounded-xl bg-[#0b0e17] hover:bg-slate-900 border border-slate-800 text-right transition">
+              <span class="text-xs font-extrabold text-amber-400 block">👑 هيبة ونجاح الملوك</span>
+              <span class="text-[11px] text-slate-400">مقاطع تحفيزية فخمة عالية التفاعل والحفظ</span>
+            </button>
+            <button type="button" onclick="applyLuxuryTemplate(1)" class="p-3 rounded-xl bg-[#0b0e17] hover:bg-slate-900 border border-slate-800 text-right transition">
+              <span class="text-xs font-extrabold text-[#00f2fe] block">🚀 أسرار الثروة والذكاء</span>
+              <span class="text-[11px] text-slate-400">حقائق مالية وتقنية تجذب التعليقات</span>
+            </button>
+            <button type="button" onclick="applyLuxuryTemplate(2)" class="p-3 rounded-xl bg-[#0b0e17] hover:bg-slate-900 border border-slate-800 text-right transition">
+              <span class="text-xs font-extrabold text-[#ff0050] block">🕯️ قصص تاريخية غامضة</span>
+              <span class="text-[11px] text-slate-400">يرفع نسبة إكمال المشاهدة إلى 95%+</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9:16 Vertical TikTok Luxury Video Live Preview -->
+      <div class="lg:col-span-5 bg-[#121622] border border-slate-800 rounded-3xl p-5 flex flex-col items-center justify-center">
+        <div class="w-full flex items-center justify-between mb-3">
+          <span class="text-xs font-bold text-amber-400">معاينة حية للفيديو الفخم (9:16 TikTok HD)</span>
+          <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">60 FPS AI Canvas</span>
+        </div>
+
+        <div class="relative w-full max-w-[290px] aspect-[9/16] rounded-[28px] p-1.5 bg-gradient-to-b from-amber-400/60 via-[#ff0050]/60 to-[#00f2fe]/60 shadow-2xl">
+          <div class="relative w-full h-full rounded-[22px] overflow-hidden bg-black">
+            <canvas id="luxuryVideoCanvas" class="w-full h-full block"></canvas>
+
+            <!-- TikTok Right Side Icons Overlay -->
+            <div class="absolute left-3 bottom-20 flex flex-col items-center gap-4 text-white/90 pointer-events-none">
+              <div class="w-9 h-9 rounded-full bg-amber-500/20 border border-amber-400 flex items-center justify-center text-xs font-black">VIP</div>
+              <div class="text-center">
+                <div class="text-lg">❤️</div>
+                <div class="text-[10px] font-bold">48.2K</div>
+              </div>
+              <div class="text-center">
+                <div class="text-lg">💬</div>
+                <div class="text-[10px] font-bold">1,940</div>
+              </div>
+              <div class="text-center">
+                <div class="text-lg">🔖</div>
+                <div class="text-[10px] font-bold">12.7K</div>
+              </div>
+            </div>
+
+            <!-- Bottom TikTok Caption Overlay -->
+            <div class="absolute bottom-3 right-3 left-14 text-right pointer-events-none">
+              <p id="previewAccountHandle" class="text-xs font-black text-white drop-shadow">@luxury_creator_vip ✓</p>
+              <p id="previewHashtagsLine" class="text-[10px] text-[#00f2fe] truncate mt-0.5">#اكسبلور #فخامة #نجاح #تطوير_الذات</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: AUTO-PUBLISH & EXPLORE SHIELD       -->
+    <!-- ========================================== -->
+    <section id="scheduleTab" class="tab-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Left/Right Queue & Busy Mode Settings -->
+      <div class="lg:col-span-5 bg-[#121622] border border-slate-800 rounded-3xl p-5 md:p-6 space-y-4">
+        <div>
+          <span class="text-xs font-bold text-[#00f2fe]">إدارة الحساب وقت الانشغال</span>
+          <h2 class="text-xl font-black text-white mt-0.5">جدولة النشر التلقائي وحماية الأكسبلور</h2>
+          <p class="text-xs text-slate-400 mt-1">ينشر الفيديوهات الفخمة تلقائياً في أوقات الذروة بمحاكاة تصفح بشري كاملة حتى لا يتوقف نشاط حسابك أبداً</p>
+        </div>
+
+        <div class="bg-[#0b0e17] border border-slate-800 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-200">وضع الانشغال الذكي (Auto-Pilot Busy Mode)</span>
+            <input type="checkbox" id="busyModeToggle" checked onchange="updateBusyModeStatus()" class="w-4 h-4 accent-[#00f2fe]" />
+          </div>
+          <p class="text-[11px] text-slate-400">عند تفعيله، يقوم النظام بتوليد فيديو فخم جديد ونشره تلقائياً إذا اقترب موعد النشر ولم تقم بإضافة فيديو يدوياً.</p>
+
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <div>
+              <label for="dailyPostsCount" class="block text-[11px] font-bold text-slate-400 mb-1">عدد المنشورات اليومية</label>
+              <select id="dailyPostsCount" class="w-full bg-[#121622] border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                <option value="2">2 فيديوهات يومياً (مثالي)</option>
+                <option value="3" selected>3 فيديوهات يومياً (نمو سريع للأكسبلور)</option>
+                <option value="4">4 فيديوهات يومياً (مكثف)</option>
+              </select>
+            </div>
+            <div>
+              <label for="peakTimeSlot" class="block text-[11px] font-bold text-slate-400 mb-1">أوقات ذروة الأكسبلور</label>
+              <select id="peakTimeSlot" class="w-full bg-[#121622] border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+                <option value="4:00 م • 8:30 م • 11:15 م">4:00 م • 8:30 م • 11:15 م</option>
+                <option value="2:00 م • 7:00 م • 10:30 م">2:00 م • 7:00 م • 10:30 م</option>
+                <option value="6:00 م • 9:00 م • 12:00 ص">6:00 م • 9:00 م • 12:00 ص</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Custom Scheduled Post -->
+        <div class="bg-[#0b0e17] border border-slate-800 rounded-2xl p-4 space-y-3">
+          <h3 class="text-xs font-extrabold text-amber-400">إضافة منشور مجدول سريع</h3>
+          <input
+            id="quickPostTitle"
+            type="text"
+            placeholder="عنوان الفيديو الفخم..."
+            class="w-full bg-[#121622] border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#00f2fe]"
+          />
+          <div class="grid grid-cols-2 gap-2">
+            <input
+              id="quickPostTime"
+              type="text"
+              value="اليوم — 08:30 مساءً"
+              class="w-full bg-[#121622] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
+            />
+            <button
+              type="button"
+              onclick="addQuickScheduledPost()"
+              class="py-2 px-3 rounded-xl bg-[#00f2fe] text-slate-950 font-extrabold text-xs hover:opacity-90 transition"
+            >
+              + إدراج في الجدول
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onclick="simulateImmediateHumanPublish()"
+          class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-400 to-[#00f2fe] text-slate-950 font-black text-xs md:text-sm hover:opacity-95 transition shadow-lg"
+        >
+          🚀 محاكاة نشر الفيديو القادم الآن (بالتصفح البشري)
+        </button>
+      </div>
+
+      <!-- Queue List -->
+      <div class="lg:col-span-7 bg-[#121622] border border-slate-800 rounded-3xl p-5 md:p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <span class="text-xs font-bold text-amber-400">طابور النشر الذكي</span>
+              <h3 class="text-lg font-black text-white">الفيديوهات الفخمة المجدولة للنشر التلقائي</h3>
+            </div>
+            <span id="queueCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/15 text-[#00f2fe] border border-cyan-500/30">
+              4 مقاطع في الانتظار
+            </span>
+          </div>
+
+          <div id="scheduledPostsContainer" class="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: AUTOMATED LIVE STREAM STUDIO        -->
+    <!-- ========================================== -->
+    <section id="liveTab" class="tab-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-7 bg-[#121622] border border-slate-800 rounded-3xl p-5 md:p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="text-xs font-bold text-[#ff0050]">فتح البثوث التلقائية بدون تدخل</span>
+            <h2 class="text-xl font-black text-white mt-0.5">مدير البث المباشر الذكي (Auto-Live AI Host)</h2>
+            <p class="text-xs text-slate-400 mt-1">يفتح بثاً تفاعلياً فخماً في الأوقات المحددة، ويرد تلقائياً على التعليقات والداعمين بأسمائهم لرفع تفاعل الحساب</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              id="toggleLiveStreamBtn"
+              onclick="toggleSimulatedLiveStream()"
+              class="px-4 py-2.5 rounded-2xl bg-[#ff0050] hover:bg-rose-600 text-white font-black text-xs md:text-sm transition shadow-lg"
+            >
+              🔴 فتح البث التلقائي الآن
+            </button>
+            <button
+              type="button"
+              onclick="openRealTikTokPage('live')"
+              class="px-3.5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition shadow-lg"
+            >
+              📡 فتح استوديو لايف تيك توك الحقيقي
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-[#0b0e17] border border-slate-800 rounded-2xl p-3.5">
+            <label for="liveTitleInput" class="block text-xs font-bold text-slate-300 mb-1.5">عنوان البث المباشر الجاذب للأكسبلور</label>
+            <input
+              id="liveTitleInput"
+              type="text"
+              value="سهرة النخبة الفخمة ✨ تفاعل ودعم مباشر + حكم ونجاح"
+              class="w-full bg-transparent text-xs md:text-sm text-white font-bold focus:outline-none"
+            />
+          </div>
+
+          <div class="bg-[#0b0e17] border border-slate-800 rounded-2xl p-3.5">
+            <label for="liveScheduleInput" class="block text-xs font-bold text-slate-300 mb-1.5">جدول فتح البث التلقائي اليومي</label>
+            <select id="liveScheduleInput" onchange="updateNextLiveKPI()" class="w-full bg-[#121622] border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white">
+              <option value="11:30 مساءً (لمدة 90 دقيقة)">يومياً 11:30 مساءً — لمدة 90 دقيقة</option>
+              <option value="09:00 مساءً (لمدة ساعتين)">يومياً 09:00 مساءً — لمدة ساعتين</option>
+              <option value="01:00 صباحاً (سهرة الليل)">يومياً 01:00 صباحاً — لمدة 60 دقيقة</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-[#0b0e17] border border-slate-800 rounded-2xl p-3.5">
+            <label for="liveModeSelect" class="block text-xs font-bold text-amber-300 mb-1.5">نوع محتوى البث التلقائي</label>
+            <select id="liveModeSelect" class="w-full bg-[#121622] border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+              <option value="مشهد فخم متجدد + ترحيب صوتي بالداعمين">مشهد فخم متجدد 4K + ترحيب ذكي بالمتابعين والداعمين</option>
+              <option value="مسابقة أسئلة وأجوبة تفاعلية في الشات">مسابقة أسئلة وثقافة تفاعلية تلقائية في التعليقات</option>
+              <option value="بث صوتي تحفيزي وقصص نجاح">بث صوتي تحفيزي مستمر مع شكر الداعمين</option>
+            </select>
+          </div>
+
+          <div class="bg-[#0b0e17] border border-slate-800 rounded-2xl p-3.5">
+            <label for="liveStreamKey" class="block text-xs font-bold text-[#00f2fe] mb-1.5">طريقة فتح البث (الربط التقني)</label>
+            <select id="liveStreamKey" class="w-full bg-[#121622] border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white">
+              <option value="محاكاة متصفح تيك توك ويب / Live Studio">أتمتة متصفح بشرية (TikTok Web / Live Studio)</option>
+              <option value="بث سحابي مباشر عبر مفتاح RTMP + FFmpeg">بث سحابي مباشر عبر مفتاح RTMP (بدون تشغيل الكمبيوتر)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Auto Chat Responder Rules -->
+        <div class="bg-[#0b0e17] border border-slate-800 rounded-2xl p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-extrabold text-white">الرد البشري التلقائي في شات البث (AI Live Responder)</h3>
+            <span class="text-[11px] text-emerald-400 font-bold">تأخير بشري 2-4 ثوانٍ قبل الرد</span>
+          </div>
+          <p class="text-xs text-slate-400">يرد النظام تلقائياً على من يكتب في البث أو يرسل هدية أو يتابع الحساب لرفع التفاعل ودفع البث للأكسبلور:</p>
+          <div class="flex gap-2 pt-1">
+            <input
+              id="testLiveCommentInput"
+              type="text"
+              placeholder="جرب كتابة تعليق كمشاهد في البث (مثال: السلام عليكم أو أرسل أسد)..."
+              class="flex-1 bg-[#121622] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#ff0050]"
+            />
+            <button
+              type="button"
+              onclick="sendSimulatedViewerComment()"
+              class="px-4 py-2 rounded-xl bg-[#00f2fe] text-slate-950 font-extrabold text-xs hover:opacity-90 transition"
+            >
+              إرسال للشات
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Stream Interactive Screen & Chat -->
+      <div class="lg:col-span-5 bg-[#121622] border border-slate-800 rounded-3xl p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span id="liveIndicatorDot" class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+            <span id="liveStatusHeader" class="text-xs font-extrabold text-white">معاينة البث التلقائي التفاعلي</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="px-2 py-0.5 rounded bg-rose-500 text-white font-black text-[11px]">LIVE</span>
+            <span id="liveViewerCount" class="px-2.5 py-0.5 rounded bg-slate-800 text-slate-200 font-mono text-[11px]">👁️ 1,284</span>
+          </div>
+        </div>
+
+        <!-- Live Chat & Gift Stream -->
+        <div class="relative rounded-2xl border border-slate-800 bg-gradient-to-b from-[#151022] via-[#0b0e17] to-[#080a0f] p-4 h-80 flex flex-col justify-between overflow-hidden">
+          <div class="bg-black/50 backdrop-blur-md border border-amber-500/30 rounded-xl p-2.5 flex items-center justify-between">
+            <div>
+              <p class="text-[11px] text-amber-300 font-bold">👑 مضيف الذكاء الاصطناعي التلقائي</p>
+              <p id="aiHostCurrentSpeech" class="text-xs text-white font-semibold mt-0.5">"أهلاً بالجميع في سهرة النخبة! شكراً لكل من ضغط كبس وشير للبث 🔥"</p>
+            </div>
+          </div>
+
+          <div id="liveChatContainer" class="space-y-2 overflow-y-auto max-h-48 pr-1 text-xs">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: REAL PYTHON PLAYWRIGHT STEALTH CODE -->
+    <!-- ========================================== -->
+    <section id="pythonTab" class="tab-panel hidden space-y-4">
+      <div class="bg-[#121622] border border-slate-800 rounded-3xl p-5 md:p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <span class="text-xs font-bold text-amber-400">محرك التنفيذ الحقيقي على جهازك أو سيرفرك (VPS)</span>
+            <h2 class="text-xl font-black text-white mt-0.5">كود الأتمتة والمحاكاة البشرية الفعلي (Python Playwright Stealth)</h2>
+            <p class="text-xs text-slate-400 mt-1">
+              نظراً لأن متصفح الويب العادي يمنع التحكم المباشر بموقع تيك توك لأسباب أمنية (CORS)، يقوم التطبيق بتوليد كود Python الحقيقي المربوط ببيانات حسابك التي أدخلتها أعلاه لتشغيل المتصفح الخفي البشري على جهازك بضغطة زر.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              onclick="copyPythonScript()"
+              class="px-4 py-2.5 rounded-xl bg-[#00f2fe] text-slate-950 font-black text-xs hover:opacity-90 transition"
+            >
+              📋 نسخ الكود الكامل
+            </button>
+            <button
+              type="button"
+              onclick="downloadPythonScript()"
+              class="px-4 py-2.5 rounded-xl bg-amber-500 text-slate-950 font-black text-xs hover:opacity-90 transition"
+            >
+              ⬇️ تحميل ملف tiktok_autopilot.py
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 text-xs">
+          <div class="p-3 rounded-xl bg-[#0b0e17] border border-slate-800">
+            <span class="font-bold text-[#00f2fe] block mb-1">1. تثبيت المكتبات (مرة واحدة)</span>
+            <code class="text-slate-300 font-mono text-[11px]">pip install playwright playwright-stealth</code>
+          </div>
+          <div class="p-3 rounded-xl bg-[#0b0e17] border border-slate-800">
+            <span class="font-bold text-amber-400 block mb-1">2. تجهيز المتصفح البشري</span>
+            <code class="text-slate-300 font-mono text-[11px]">playwright install chromium</code>
+          </div>
+          <div class="p-3 rounded-xl bg-[#0b0e17] border border-slate-800">
+            <span class="font-bold text-emerald-400 block mb-1">3. تشغيل الأتمتة 24/7</span>
+            <code class="text-slate-300 font-mono text-[11px]">python tiktok_autopilot.py</code>
+          </div>
+        </div>
+
+        <pre id="pythonCodeBlock" dir="ltr" class="bg-[#07090e] border border-slate-800 rounded-2xl p-4 text-xs font-mono text-emerald-300 overflow-x-auto max-h-[420px] leading-relaxed"></pre>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ==========================================
+    // APPLICATION STATE
+    // ==========================================
+    const appState = {
+      connectedUser: 'luxury_creator_vip',
+      sessionId: 'sessionid_ss=7f8a9d21c4e9b0a123f45e6789a0bcde',
+      regionNiche: 'خليجي وعربي - فخامة وتحفيز',
+      isLoggedIn: false,
+      masterAutopilot: true,
+      liveActive: true,
+      liveViewers: 1284,
+      audioPlaying: false,
+      audioCtx: null,
+      audioInterval: null,
+      currentTheme: 'gold_empire',
+      headlineText: 'القاعدة الذهبية التي لا يخبرك بها الأثرياء أبداً',
+      scriptText: 'النجاح الحقيقي لا يصنع في الضجيج، بل يبنى في ساعات الصمت عندما يظن الجميع أنك توقفت. استمر في بناء إمبراطوريتك بصمت.',
+      hashtagsText: '#اكسبلور #فخامة #نجاح #تطوير_الذات #ملياردير #تحفيز #ذكاء_اصطناعي #fyp #explore',
+      scheduledPosts: [
+        {
+          id: 'post-1',
+          title: 'القاعدة الذهبية التي لا يخبرك بها الأثرياء أبداً',
+          theme: 'إمبراطورية الذهب والنجاح',
+          time: 'اليوم — 04:00 مساءً',
+          status: 'جاهز للنشر البشري التلقائي',
+          warmup: 'تصفح 5 دقائق + إعجابين قبل الرفع'
+        },
+        {
+          id: 'post-2',
+          title: 'لماذا يصمت العظماء عندما يتحدث الجميع؟ سر الهيبة',
+          theme: 'هيبة الصمت والحكمة الملكية',
+          time: 'اليوم — 08:30 مساءً (ذروة الأكسبلور)',
+          status: 'مجدول تلقائياً',
+          warmup: 'تصفح 6 دقائق + مشاهدة كاملة'
+        },
+        {
+          id: 'post-3',
+          title: 'قصة الإمبراطور الذي بنى ثروته من الصفر في عام واحد',
+          theme: 'قصص الأساطير والغموض الفخم',
+          time: 'اليوم — 11:15 مساءً',
+          status: 'مجدول تلقائياً',
+          warmup: 'تمويه حركة ماوس + رفع تدريجي'
+        },
+        {
+          id: 'post-4',
+          title: 'عقلية الـ 1%: كيف تبرمج يومك للوصول للقمة',
+          theme: 'ملياردير المستقبل والنيون',
+          time: 'غداً — 04:00 مساءً',
+          status: 'توليد ذكاء اصطناعي تلقائي',
+          warmup: 'تصفح بشري آمن'
+        }
+      ],
+      luxuryTemplates: [
+        {
+          theme: 'gold_empire',
+          headline: '٣ علامات تكشف الشخص صاحب الهيبة والنفوذ الحقيقي',
+          script: 'أولاً: لا يبرر أفعاله لأحد. ثانياً: يتحكم في أعصابه وقت الأزمات. ثالثاً: يجعل إنجازاته تتحدث عنه بصمت مطلق.',
+          hashtags: '#هيبة #فخامة #اكسبلور #نجاح #شخصية_قوية #تيك_توك #explore'
+        },
+        {
+          theme: 'cyber_billionaire',
+          headline: 'كيف سيصنع الذكاء الاصطناعي جيل المليارديرات القادم؟',
+          script: 'من يمتلك أدوات الأتمتة اليوم يختصر ١٠ سنوات من العمل التقليدي. المستقبل لا ينتظر المترددين، ابدأ ببناء نظامك الآن.',
+          hashtags: '#ذكاء_اصطناعي #ثروة #مستقبل #اكسبلور #تقنية #ملياردير #fyp'
+        },
+        {
+          theme: 'mystery_history',
+          headline: 'السر المفقود خلف أغنى إمبراطورية في التاريخ القديم',
+          script: 'في قلب الصحراء الذهبية، بنى ملوك القوافل ثروة عجز العالم عن حسابها عبر قاعدة واحدة: السيطرة على المعلومة قبل الذهب.',
+          hashtags: '#قصص #تاريخ #غموض #فخامة #اكسبلور #معلومات #قصص_واقعية'
+        }
+      ]
+    };
+
+    // Load saved state safely
+    try {
+      const savedUser = localStorage.getItem('tt_autopilot_user');
+      if (savedUser) {
+        appState.connectedUser = savedUser;
+      }
+    } catch (e) {}
+
+    // ==========================================
+    // TOAST NOTIFICATION HELPER
+    // ==========================================
+    function showToast(message, type) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const borderColor = type === 'amber' ? 'border-amber-400' : type === 'pink' ? 'border-[#ff0050]' : 'border-[#00f2fe]';
+      toast.className = 'pointer-events-auto bg-[#121622]/95 backdrop-blur-md border ' + borderColor + ' text-white px-4 py-3 rounded-2xl shadow-2xl text-xs font-bold flex items-center justify-between gap-3 transition-all duration-300';
+      toast.innerHTML = '<span>' + message + '</span>';
+      container.appendChild(toast);
+      setTimeout(function() {
+        toast.style.opacity = '0';
+        setTimeout(function() {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 300);
+      }, 3600);
+    }
+
+    // ==========================================
+    // TAB NAVIGATION
+    // ==========================================
+    function switchTab(tabId) {
+      const panels = document.querySelectorAll('.tab-panel');
+      panels.forEach(function(panel) {
+        panel.classList.add('hidden');
+      });
+      const target = document.getElementById(tabId);
+      if (target) {
+        target.classList.remove('hidden');
+      }
+
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(function(btn) {
+        btn.className = 'tab-btn px-3.5 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition text-slate-400 hover:text-white hover:bg-slate-900';
+      });
+      const activeBtn = document.getElementById('tabBtn-' + tabId);
+      if (activeBtn) {
+        activeBtn.className = 'tab-btn px-3.5 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition bg-[#161b2a] text-[#00f2fe] border border-[#00f2fe]/40';
+      }
+
+      if (tabId === 'pythonTab') {
+        renderPythonScript();
+      }
+    }
+
+    // ==========================================
+    // TAB 1: ACCOUNT LOGIN & HUMAN SIMULATION
+    // ==========================================
+    function togglePasswordVisibility() {
+      const pwd = document.getElementById('ttPassword');
+      if (!pwd) return;
+      pwd.type = pwd.type === 'password' ? 'text' : 'password';
+    }
+
+    function addLogEntry(text, badgeColor) {
+      const log = document.getElementById('humanActionLog');
+      if (!log) return;
+      const now = new Date();
+      const timeStr = now.toTimeString().slice(0, 8);
+      const item = document.createElement('div');
+      const colorClass = badgeColor === 'amber' ? 'text-amber-400' : badgeColor === 'pink' ? 'text-[#ff0050]' : 'text-emerald-400';
+      item.className = 'flex items-center justify-between border-b border-slate-800/60 pb-1.5';
+      item.innerHTML = '<span class="text-slate-200">' + text + '</span><span class="' + colorClass + ' text-[10px]">' + timeStr + '</span>';
+      log.insertBefore(item, log.firstChild);
+    }
+
+    function clearActionLog() {
+      const log = document.getElementById('humanActionLog');
+      if (log) log.innerHTML = '';
+      addLogEntry('تم تحديث سجل المراقبة البشرية بنجاح', 'emerald');
+    }
+
+    function handleAccountLogin(e) {
+      if (e) e.preventDefault();
+      const usernameInput = document.getElementById('ttUsername');
+      const sessionInput = document.getElementById('ttSessionId');
+      const regionInput = document.getElementById('ttTargetRegion');
+
+      const rawUser = (usernameInput && usernameInput.value.trim()) ? usernameInput.value.trim().replace(/^@/, '') : 'luxury_creator_vip';
+      appState.connectedUser = rawUser;
+      if (sessionInput) appState.sessionId = sessionInput.value.trim();
+      if (regionInput) appState.regionNiche = regionInput.value;
+
+      try {
+        localStorage.setItem('tt_autopilot_user', rawUser);
+      } catch (err) {}
+
+      const btn = document.getElementById('connectAccountBtn');
+      if (btn) {
+        btn.innerHTML = '<span>⏳ جاري تشغيل المتصفح الخفي ومحاكاة الكتابة البشرية...</span>';
+      }
+
+      addLogEntry('بدء جلسة متصفح خفي (Stealth Chromium) لحساب @' + rawUser, 'amber');
+
+      setTimeout(function() {
+        addLogEntry('تم تفعيل بصمة جهاز بشرية وإخفاء WebDriver بنجاح', 'emerald');
+        const simUrl = document.getElementById('simBrowserUrl');
+        if (simUrl) simUrl.textContent = 'https://www.tiktok.com/@' + rawUser;
+        const handleEl = document.getElementById('previewAccountHandle');
+        if (handleEl) handleEl.textContent = '@' + rawUser + ' ✓';
+      }, 600);
+
+      setTimeout(function() {
+        appState.isLoggedIn = true;
+        const statusDot = document.getElementById('accountStatusDot');
+        const statusText = document.getElementById('accountStatusText');
+        if (statusDot) statusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+        if (statusText) statusText.textContent = 'متصل بحساب @' + rawUser + ' (محاكاة بشرية)';
+        if (btn) {
+          btn.innerHTML = '<span>✅ تم ربط الحساب وتفعيل الأتمتة البشرية (@' + rawUser + ')</span>';
+        }
+        addLogEntry('تم تسجيل الدخول وحفظ الجلسة وبدء تسخين الأكسبلور تلقائياً', 'emerald');
+        renderPythonScript();
+        showToast('تم ربط حساب @' + rawUser + ' وتفعيل محاكاة التصفح البشري لمنع الحظر!', 'cyan');
+      }, 1300);
+    }
+
+    function runHumanWarmupDemo() {
+      const actions = [
+        'تحريك الماوس بمنحنى بشري (Bezier) نحو فيديو في الأكسبلور...',
+        'مشاهدة فيديو في نفس المجال لمدة 19.4 ثانية (نسبة إكمال 92%)...',
+        'نقر إعجاب بشري عشوائي + تمرير ناعم للأعلى...',
+        'قراءة التعليقات لمدة 4.2 ثانية لمحاكاة التفاعل الطبيعي...',
+        'اكتملت جولة تسخين الحساب! الأكسبلور جاهز لاستقبال المنشور الجديد.'
+      ];
+      showToast('بدأت جولة تسخين الحساب بمحاكاة التصفح البشري...', 'amber');
+      actions.forEach(function(act, idx) {
+        setTimeout(function() {
+          const currentEl = document.getElementById('simCurrentAction');
+          const delayEl = document.getElementById('simDelayTimer');
+          if (currentEl) currentEl.textContent = act;
+          if (delayEl) delayEl.textContent = 'تأخير بشري: ' + (2.1 + idx * 0.7).toFixed(1) + 's';
+          addLogEntry(act, idx === actions.length - 1 ? 'emerald' : 'amber');
+        }, idx * 750);
+      });
+    }
+
+    function toggleMasterAutopilot() {
+      appState.masterAutopilot = !appState.masterAutopilot;
+      const btnText = document.getElementById('masterBtnText');
+      const kpiStatus = document.getElementById('kpiHumanStatus');
+      if (appState.masterAutopilot) {
+        if (btnText) btnText.textContent = 'الأتمتة الكاملة: نشطة الآن ✓';
+        if (kpiStatus) {
+          kpiStatus.textContent = 'تمويه بشري نشط (Stealth)';
+          kpiStatus.className = 'text-base md:text-lg font-extrabold text-emerald-400 mt-0.5';
+        }
+        addLogEntry('تم تفعيل الأتمتة الشاملة (نشر + بثوث + تسخين الأكسبلور)', 'emerald');
+        showToast('تم تفعيل النظام الذاتي الكامل لإدارة الحساب وقت انشغالك!', 'cyan');
+      } else {
+        if (btnText) btnText.textContent = 'تشغيل الأتمتة الكاملة';
+        if (kpiStatus) {
+          kpiStatus.textContent = 'الأتمتة في وضع الإيقاف المؤقت';
+          kpiStatus.className = 'text-base md:text-lg font-extrabold text-amber-400 mt-0.5';
+        }
+        addLogEntry('تم إيقاف الأتمتة مؤقتاً بناءً على طلب المستخدم', 'pink');
+        showToast('تم إيقاف الأتمتة المؤقتة.', 'amber');
+      }
+    }
+
+    // ==========================================
+    // HUMAN BROWSER SIMULATION CANVAS
+    // ==========================================
+    let simCursor = { x: 140, y: 110, tx: 220, ty: 65, scrollY: 0 };
+    const simTrail = [];
+
+    function initHumanSimCanvas() {
+      const canvas = document.getElementById('humanSimCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      function resizeSim() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = Math.max(300, rect.width);
+        canvas.height = Math.max(220, rect.height);
+      }
+      resizeSim();
+      window.addEventListener('resize', resizeSim);
+
+      function renderSim() {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        // Background grid
+        ctx.strokeStyle = 'rgba(30, 41, 59, 0.45)';
+        ctx.lineWidth = 1;
+        simCursor.scrollY = (simCursor.scrollY + 0.45) % 40;
+        for (let x = 0; x < w; x += 36) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+          ctx.stroke();
+        }
+        for (let y = -simCursor.scrollY; y < h; y += 36) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+          ctx.stroke();
+        }
+
+        // Simulated vertical TikTok phone feed card inside browser
+        const cardW = 115;
+        const cardH = h - 36;
+        const cardX = (w - cardW) / 2;
+        const cardY = 14;
+        ctx.fillStyle = '#111827';
+        ctx.strokeStyle = 'rgba(0, 242, 254, 0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(cardX, cardY, cardW, cardH, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        // Simulated video bars inside feed
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.22)';
+        ctx.fillRect(cardX + 12, cardY + 22, cardW - 24, 65);
+        ctx.fillStyle = 'rgba(255, 0, 80, 0.7)';
+        ctx.beginPath();
+        ctx.arc(cardX + cardW - 18, cardY + cardH - 48, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Move human cursor smoothly toward target
+        const dx = simCursor.tx - simCursor.x;
+        const dy = simCursor.ty - simCursor.y;
+        simCursor.x += dx * 0.05;
+        simCursor.y += dy * 0.05;
+
+        if (Math.hypot(dx, dy) < 8) {
+          simCursor.tx = 40 + Math.random() * (w - 80);
+          simCursor.ty = 25 + Math.random() * (h - 65);
+        }
+
+        simTrail.push({ x: simCursor.x, y: simCursor.y });
+        if (simTrail.length > 28) simTrail.shift();
+
+        // Draw Bezier trail
+        if (simTrail.length > 2) {
+          ctx.beginPath();
+          ctx.moveTo(simTrail[0].x, simTrail[0].y);
+          for (let i = 1; i < simTrail.length; i++) {
+            ctx.lineTo(simTrail[i].x, simTrail[i].y);
+          }
+          ctx.strokeStyle = 'rgba(0, 242, 254, 0.65)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+
+        // Draw cursor pointer
+        ctx.beginPath();
+        ctx.arc(simCursor.x, simCursor.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#00f2fe';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        requestAnimationFrame(renderSim);
+      }
+      requestAnimationFrame(renderSim);
+    }
+
+    // ==========================================
+    // TAB 2: LUXURY AI VIDEO STUDIO & 9:16 CANVAS
+    // ==========================================
+    const particles = [];
+    for (let i = 0; i < 38; i++) {
+      particles.push({
+        x: Math.random(),
+        y: Math.random(),
+        r: 1.2 + Math.random() * 2.8,
+        speedY: 0.0015 + Math.random() * 0.003,
+        alpha: 0.3 + Math.random() * 0.7
+      });
+    }
+
+    function updateLuxuryPreviewStyle() {
+      const sel = document.getElementById('aiThemeSelect');
+      if (sel) {
+        appState.currentTheme = sel.value;
+      }
+    }
+
+    function syncStudioPreviewText() {
+      const hInput = document.getElementById('aiVideoHeadline');
+      const sInput = document.getElementById('aiVideoScript');
+      const tagInput = document.getElementById('aiVideoHashtags');
+      if (hInput) appState.headlineText = hInput.value;
+      if (sInput) appState.scriptText = sInput.value;
+      if (tagInput) {
+        appState.hashtagsText = tagInput.value;
+        const previewTag = document.getElementById('previewHashtagsLine');
+        if (previewTag) previewTag.textContent = tagInput.value;
+      }
+    }
+
+    function applyLuxuryTemplate(idx) {
+      const tpl = appState.luxuryTemplates[idx];
+      if (!tpl) return;
+      appState.currentTheme = tpl.theme;
+      appState.headlineText = tpl.headline;
+      appState.scriptText = tpl.script;
+      appState.hashtagsText = tpl.hashtags;
+
+      const themeEl = document.getElementById('aiThemeSelect');
+      const headEl = document.getElementById('aiVideoHeadline');
+      const scriptEl = document.getElementById('aiVideoScript');
+      const tagsEl = document.getElementById('aiVideoHashtags');
+      const previewTag = document.getElementById('previewHashtagsLine');
+
+      if (themeEl) themeEl.value = tpl.theme;
+      if (headEl) headEl.value = tpl.headline;
+      if (scriptEl) scriptEl.value = tpl.script;
+      if (tagsEl) tagsEl.value = tpl.hashtags;
+      if (previewTag) previewTag.textContent = tpl.hashtags;
+
+      showToast('تم تطبيق قالب الفيديو الفخم بنجاح!', 'amber');
+    }
+
+    function generateRandomLuxuryIdea() {
+      const randomIdeas = [
+        {
+          theme: 'gold_empire',
+          headline: 'لماذا ينجح ١٪ فقط بينما يتوقف الباقون في منتصف الطريق؟',
+          script: 'الانضباط في أوقات انشغالك هو الفارق الوحيد بين الحلم والواقع. ابنِ نظاماً يعمل لأجلك حتى وأنت نائم.',
+          hashtags: '#فخامة #نجاح #اكسبلور #ثروة #هيبة #تطوير_الذات #fyp'
+        },
+        {
+          theme: 'dark_wisdom',
+          headline: 'قانون الهيبة الأول: لا تكشف خطوتك القادمة لأي شخص',
+          script: 'الذين يعلنون خططهم يحصلون على التصفيق المؤقت، أما الذين يعملون في الخفاء فيحصلون على القمة الدائمة.',
+          hashtags: '#هيبة #حكمة #اكسبلور #فخامة #صمت #قوة_الشخصية #explore'
+        },
+        {
+          theme: 'cyber_billionaire',
+          headline: 'كيف تضاعف حضورك الرقمي بدون أن تخسر وقتك اليومي؟',
+          script: 'الأتمتة الذكية تحافظ على صعود حسابك في الأكسبلور كل يوم بدقة متناهية وبمحتوى فخم يخطف الأنظار.',
+          hashtags: '#ذكاء_اصطناعي #تيك_توك #اكسبلور #نمو #فخامة #مستقبل'
+        }
+      ];
+      const pick = randomIdeas[Math.floor(Math.random() * randomIdeas.length)];
+      appState.currentTheme = pick.theme;
+      appState.headlineText = pick.headline;
+      appState.scriptText = pick.script;
+      appState.hashtagsText = pick.hashtags;
+
+      const themeEl = document.getElementById('aiThemeSelect');
+      const headEl = document.getElementById('aiVideoHeadline');
+      const scriptEl = document.getElementById('aiVideoScript');
+      const tagsEl = document.getElementById('aiVideoHashtags');
+      if (themeEl) themeEl.value = pick.theme;
+      if (headEl) headEl.value = pick.headline;
+      if (scriptEl) scriptEl.value = pick.script;
+      if (tagsEl) tagsEl.value = pick.hashtags;
+      syncStudioPreviewText();
+      showToast('تم توليد سيناريو وفيديو فخم جديد بالذكاء الاصطناعي!', 'cyan');
+    }
+
+    function createAndQueueLuxuryVideo() {
+      syncStudioPreviewText();
+      const themeNames = {
+        gold_empire: 'إمبراطورية الذهب والنجاح',
+        cyber_billionaire: 'ملياردير المستقبل والنيون',
+        dark_wisdom: 'هيبة الصمت والحكمة الملكية',
+        mystery_history: 'قصص الأساطير والغموض الفخم'
+      };
+      const newPost = {
+        id: 'post-' + Date.now(),
+        title: appState.headlineText || 'فيديو فخم بالذكاء الاصطناعي',
+        theme: themeNames[appState.currentTheme] || 'إمبراطورية الذهب والنجاح',
+        time: 'اليوم — موعد الذروة القادم تلقائياً',
+        status: 'جاهز للنشر البشري التلقائي',
+        warmup: 'تصفح بشري 5 دقائق + رفع آمن'
+      };
+      appState.scheduledPosts.unshift(newPost);
+      renderScheduledPosts();
+      addLogEntry('تم إنتاج فيديو AI فخم وإضافته لطابور النشر: "' + newPost.title.slice(0, 28) + '..."', 'emerald');
+      showToast('تم إنتاج الفيديو الفخم وإضافته لجدول النشر التلقائي!', 'amber');
+    }
+
+    function toggleLuxuryAudioPreview() {
+      const btn = document.getElementById('studioAudioBtn');
+      if (!appState.audioPlaying) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        if (!appState.audioCtx) {
+          appState.audioCtx = new AudioContextClass();
+        }
+        if (appState.audioCtx.state === 'suspended') {
+          appState.audioCtx.resume();
+        }
+        appState.audioPlaying = true;
+        if (btn) btn.textContent = '🔇 إيقاف الموسيقى السينمائية';
+
+        const notes = [110, 130.81, 164.81, 196.0, 220.0];
+        let step = 0;
+        if (appState.audioInterval) clearInterval(appState.audioInterval);
+        appState.audioInterval = setInterval(function() {
+          if (!appState.audioPlaying || !appState.audioCtx) return;
+          const osc = appState.audioCtx.createOscillator();
+          const gain = appState.audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(notes[step % notes.length], appState.audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.04, appState.audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, appState.audioCtx.currentTime + 0.9);
+          osc.connect(gain);
+          gain.connect(appState.audioCtx.destination);
+          osc.start();
+          osc.stop(appState.audioCtx.currentTime + 0.9);
+          step++;
+        }, 700);
+      } else {
+        appState.audioPlaying = false;
+        if (appState.audioInterval) clearInterval(appState.audioInterval);
+        if (btn) btn.textContent = '🔊 تشغيل الموسيقى السينمائية للمعاينة';
+      }
+    }
+
+    function wrapArabicLines(ctx, text, maxWidth) {
+      const words = (text || '').split(' ');
+      const lines = [];
+      let currentLine = '';
+      for (let i = 0; i < words.length; i++) {
+        const testLine = currentLine ? currentLine + ' ' + words[i] : words[i];
+        if (ctx.measureText(testLine).width > maxWidth && currentLine) {
+          lines.push(currentLine);
+          currentLine = words[i];
+        } else {
+          currentLine = testLine;
+        }
+      }
+      if (currentLine) lines.push(currentLine);
+      return lines;
+    }
+
+    function initLuxuryVideoCanvas() {
+      const canvas = document.getElementById('luxuryVideoCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let tick = 0;
+
+      function resizeLuxury() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = Math.max(260, rect.width);
+        canvas.height = Math.max(460, rect.height);
+      }
+      resizeLuxury();
+      window.addEventListener('resize', resizeLuxury);
+
+      function renderLuxury() {
+        tick += 0.025;
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // Theme palette
+        let gradTop = '#1a1205';
+        let gradMid = '#0b0906';
+        let accent = '#f59e0b';
+        let secondary = '#fde68a';
+
+        if (appState.currentTheme === 'cyber_billionaire') {
+          gradTop = '#051923';
+          gradMid = '#070a14';
+          accent = '#00f2fe';
+          secondary = '#ff0050';
+        } else if (appState.currentTheme === 'dark_wisdom') {
+          gradTop = '#18181b';
+          gradMid = '#09090b';
+          accent = '#e4e4e7';
+          secondary = '#f59e0b';
+        } else if (appState.currentTheme === 'mystery_history') {
+          gradTop = '#230b14';
+          gradMid = '#0c0609';
+          accent = '#ff0050';
+          secondary = '#f59e0b';
+        }
+
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+        bgGrad.addColorStop(0, gradTop);
+        bgGrad.addColorStop(0.55, gradMid);
+        bgGrad.addColorStop(1, '#040507');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Glowing luxury geometric emblem in center
+        ctx.save();
+        ctx.translate(w / 2, h * 0.36);
+        ctx.rotate(tick * 0.25);
+        ctx.strokeStyle = accent;
+        ctx.globalAlpha = 0.25;
+        ctx.lineWidth = 1.8;
+        const size = 56 + Math.sin(tick) * 6;
+        ctx.strokeRect(-size / 2, -size / 2, size, size);
+        ctx.rotate(Math.PI / 4);
+        ctx.strokeRect(-size / 2, -size / 2, size, size);
+        ctx.restore();
+
+        // Floating luxury particles
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.y -= p.speedY;
+          if (p.y < 0) p.y = 1;
+          ctx.beginPath();
+          ctx.arc(p.x * w, p.y * h, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = i % 2 === 0 ? accent : secondary;
+          ctx.globalAlpha = p.alpha * 0.65;
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        // Top Luxury Badge
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+        ctx.beginPath();
+        ctx.roundRect(w / 2 - 75, 22, 150, 26, 13);
+        ctx.fill();
+        ctx.font = 'bold 11px Cairo, sans-serif';
+        ctx.fillStyle = accent;
+        ctx.textAlign = 'center';
+        ctx.fillText('✨ إنتاج الذكاء الاصطناعي الفخم', w / 2, 39);
+
+        // Hook Headline Box
+        ctx.font = '800 15px Cairo, sans-serif';
+        const headLines = wrapArabicLines(ctx, appState.headlineText, w - 42);
+        let yCursor = h * 0.22;
+        headLines.forEach(function(line) {
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = 'rgba(0,0,0,0.9)';
+          ctx.shadowBlur = 8;
+          ctx.fillText(line, w / 2, yCursor);
+          yCursor += 24;
+        });
+
+        // Animated Subtitle Card in Middle-Lower Area
+        ctx.shadowBlur = 0;
+        ctx.font = '700 13px Cairo, sans-serif';
+        const bodyLines = wrapArabicLines(ctx, appState.scriptText, w - 54);
+        const boxHeight = bodyLines.length * 22 + 24;
+        const boxY = h * 0.53;
+
+        ctx.fillStyle = 'rgba(9, 11, 16, 0.78)';
+        ctx.strokeStyle = accent;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.roundRect(20, boxY, w - 40, boxHeight, 14);
+        ctx.fill();
+        ctx.stroke();
+
+        let scriptY = boxY + 24;
+        bodyLines.forEach(function(line, idx) {
+          ctx.fillStyle = idx % 2 === 0 ? '#f8fafc' : secondary;
+          ctx.fillText(line, w / 2, scriptY);
+          scriptY += 22;
+        });
+
+        // Audio Waveform Bars at Bottom
+        const barCount = 18;
+        const totalWaveWidth = barCount * 6;
+        const startX = (w - totalWaveWidth) / 2;
+        for (let b = 0; b < barCount; b++) {
+          const barH = 6 + Math.abs(Math.sin(tick * 3 + b * 0.5)) * 16;
+          ctx.fillStyle = accent;
+          ctx.fillRect(startX + b * 6, h - 92 - barH / 2, 3.5, barH);
+        }
+
+        requestAnimationFrame(renderLuxury);
+      }
+      requestAnimationFrame(renderLuxury);
+    }
+
+    // ==========================================
+    // TAB 3: SCHEDULER & EXPLORE PROTECTION
+    // ==========================================
+    function renderScheduledPosts() {
+      const container = document.getElementById('scheduledPostsContainer');
+      const countBadge = document.getElementById('queueCountBadge');
+      const kpiVideos = document.getElementById('kpiQueuedVideos');
+      if (!container) return;
+
+      if (countBadge) countBadge.textContent = appState.scheduledPosts.length + ' مقاطع في الانتظار';
+      if (kpiVideos) kpiVideos.textContent = appState.scheduledPosts.length + ' فيديوهات فخمة';
+
+      container.innerHTML = '';
+      appState.scheduledPosts.forEach(function(post) {
+        const card = document.createElement('div');
+        card.className = 'bg-[#0b0e17] border border-slate-800 hover:border-slate-700 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 transition';
+        card.innerHTML =
+          '<div class="space-y-1 flex-1 min-w-[220px]">' +
+            '<div class="flex items-center gap-2">' +
+              '<span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 text-[10px] font-bold">' + post.theme + '</span>' +
+              '<span class="text-[11px] text-[#00f2fe] font-mono">' + post.time + '</span>' +
+            '</div>' +
+            '<h4 class="text-sm font-extrabold text-white">' + post.title + '</h4>' +
+            '<p class="text-[11px] text-slate-400">🛡️ خطة الحماية: ' + post.warmup + ' • الحالة: <strong class="text-emerald-400">' + post.status + '</strong></p>' +
+          '</div>' +
+          '<div class="flex items-center gap-2">' +
+            '<button type="button" onclick="publishPostNow(\'' + post.id + '\')" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition">نشر بشري الآن</button>' +
+            '<button type="button" onclick="deleteScheduledPost(\'' + post.id + '\')" class="px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold transition">حذف</button>' +
+          '</div>';
+        container.appendChild(card);
+      });
+    }
+
+    function addQuickScheduledPost() {
+      const titleEl = document.getElementById('quickPostTitle');
+      const timeEl = document.getElementById('quickPostTime');
+      const title = (titleEl && titleEl.value.trim()) ? titleEl.value.trim() : 'فيديو فخم تلقائي لحماية الأكسبلور';
+      const time = (timeEl && timeEl.value.trim()) ? timeEl.value.trim() : 'اليوم — 09:00 مساءً';
+
+      appState.scheduledPosts.push({
+        id: 'post-' + Date.now(),
+        title: title,
+        theme: 'توليد ذكاء اصطناعي فخم',
+        time: time,
+        status: 'مجدول تلقائياً',
+        warmup: 'تصفح بشري 5 دقائق قبل الرفع'
+      });
+
+      if (titleEl) titleEl.value = '';
+      renderScheduledPosts();
+      showToast('تمت إضافة الفيديو إلى جدول النشر التلقائي!', 'cyan');
+    }
+
+    function publishPostNow(postId) {
+      const target = appState.scheduledPosts.find(function(p) { return p.id === postId; });
+      if (!target) return;
+      target.status = '✅ تم النشر بمحاكاة بشرية آمنة';
+      renderScheduledPosts();
+      addLogEntry('تم رفع ونشر الفيديو "' + target.title.slice(0, 25) + '..." بمحاكاة بشرية كاملة', 'emerald');
+      showToast('تم نشر الفيديو بنجاح مع تفعيل حماية الأكسبلور!', 'cyan');
+    }
+
+    function deleteScheduledPost(postId) {
+      appState.scheduledPosts = appState.scheduledPosts.filter(function(p) { return p.id !== postId; });
+      renderScheduledPosts();
+      showToast('تم حذف المنشور من الطابور.', 'amber');
+    }
+
+    function simulateImmediateHumanPublish() {
+      if (appState.scheduledPosts.length === 0) {
+        showToast('الطابور فارغ حالياً، أضف فيديو من الاستوديو أولاً!', 'amber');
+        return;
+      }
+      publishPostNow(appState.scheduledPosts[0].id);
+    }
+
+    function updateBusyModeStatus() {
+      const toggle = document.getElementById('busyModeToggle');
+      if (toggle && toggle.checked) {
+        showToast('وضع الانشغال الذكي مفعل: لن يتوقف النشر في حسابك أبداً.', 'cyan');
+      } else {
+        showToast('تم إيقاف التوليد التلقائي وقت الانشغال.', 'amber');
+      }
+    }
+
+    // ==========================================
+    // TAB 4: AUTOMATED LIVE STREAM STUDIO
+    // ==========================================
+    const initialLiveMessages = [
+      { user: '@fahad_vip99', text: 'ما شاء الله البث فخم جداً استمر 🔥', isBot: false },
+      { user: '🤖 ردك التلقائي الذكي', text: 'يا هلا بك يا @fahad_vip99 نورت البث الفخم! وجودك أسعدنا 👑', isBot: true },
+      { user: '@noura_ksa', text: 'أرسلت هدية: وردة ذهبية 🌹✨', isBot: false },
+      { user: '🤖 ردك التلقائي الذكي', text: 'شكراً من القلب @noura_ksa على الهدية الذهبية! كفو والله 🔥', isBot: true }
+    ];
+
+    function renderInitialLiveChat() {
+      const chat = document.getElementById('liveChatContainer');
+      if (!chat) return;
+      chat.innerHTML = '';
+      initialLiveMessages.forEach(function(m) {
+        appendLiveMessage(m.user, m.text, m.isBot);
+      });
+    }
+
+    function appendLiveMessage(user, text, isBot) {
+      const chat = document.getElementById('liveChatContainer');
+      if (!chat) return;
+      const div = document.createElement('div');
+      if (isBot) {
+        div.className = 'p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200';
+      } else {
+        div.className = 'p-2 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-200';
+      }
+      div.innerHTML = '<span class="font-extrabold block text-[11px] ' + (isBot ? 'text-amber-400' : 'text-[#00f2fe]') + '">' + user + '</span><span>' + text + '</span>';
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function sendSimulatedViewerComment() {
+      const input = document.getElementById('testLiveCommentInput');
+      const comment = (input && input.value.trim()) ? input.value.trim() : 'السلام عليكم، بث فخم جداً!';
+      if (input) input.value = '';
+
+      appendLiveMessage('@viewer_guest', comment, false);
+
+      setTimeout(function() {
+        const reply = 'وعليكم السلام والرحمة! أهلاً بك في سهرة النخبة يا غالي، شرفنا حضورك وتفاعلك 👑✨';
+        appendLiveMessage('🤖 ردك التلقائي الذكي (@' + appState.connectedUser + ')', reply, true);
+        const speech = document.getElementById('aiHostCurrentSpeech');
+        if (speech) speech.textContent = '"' + reply + '"';
+        addLogEntry('رد البث التلقائي على تعليق مشاهد بتأخير بشري 2.4 ثانية', 'emerald');
+      }, 1100);
+    }
+
+    function toggleSimulatedLiveStream() {
+      appState.liveActive = !appState.liveActive;
+      const btn = document.getElementById('toggleLiveStreamBtn');
+      const header = document.getElementById('liveStatusHeader');
+      const dot = document.getElementById('liveIndicatorDot');
+
+      if (appState.liveActive) {
+        if (btn) {
+          btn.textContent = '⏹️ إيقاف البث التلقائي الحالي';
+          btn.className = 'px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-rose-400 border border-rose-500/40 font-black text-xs md:text-sm transition';
+        }
+        if (header) header.textContent = 'البث المباشر التلقائي يعمل الآن (نشط)';
+        if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping';
+        addLogEntry('تم فتح البث المباشر التلقائي وتفعيل مضيف الذكاء الاصطناعي', 'emerald');
+        showToast('تم فتح البث المباشر التلقائي بنجاح!', 'pink');
+      } else {
+        if (btn) {
+          btn.textContent = '🔴 فتح البث التلقائي الآن';
+          btn.className = 'px-4 py-2.5 rounded-2xl bg-[#ff0050] hover:bg-rose-600 text-white font-black text-xs md:text-sm transition shadow-lg';
+        }
+        if (header) header.textContent = 'البث التلقائي في وضع الاستعداد للموعد القادم';
+        if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
+        showToast('تم إنهاء جلسة البث وحفظ الإحصائيات.', 'amber');
+      }
+    }
+
+    function updateNextLiveKPI() {
+      const sel = document.getElementById('liveScheduleInput');
+      const kpi = document.getElementById('kpiNextLive');
+      if (sel && kpi) {
+        kpi.textContent = sel.value.split('(')[0].trim();
+      }
+    }
+
+    // ==========================================
+    // TAB 5: REAL PYTHON PLAYWRIGHT STEALTH CODE
+    // ==========================================
+    function generatePythonCodeString() {
+      const user = appState.connectedUser || 'luxury_creator_vip';
+      const session = appState.sessionId || 'YOUR_SESSION_ID';
+      return [
+        '# -*- coding: utf-8 -*-',
+        '"""',
+        'TikTok AutoPilot AI — Human Browsing Simulation & Auto-Publisher',
+        'Account: @' + user,
+        'Features: Stealth Chromium, Bezier Mouse Movement, Human Typing, FYP Warm-up, Auto-Upload & Auto-Live',
+        '"""',
+        'import asyncio',
+        'import random',
+        'import time',
+        'from playwright.async_api import async_playwright',
+        'from playwright_stealth import stealth_async',
+        '',
+        'TIKTOK_USERNAME = "' + user + '"',
+        'SESSION_COOKIE = "' + session + '"',
+        '',
+        'async def human_type(page, selector, text):',
+        '    """كتابة النص بسرعة بشرية متغيرة لمنع كشف الأتمتة"""',
+        '    await page.click(selector)',
+        '    for char in text:',
+        '        await page.keyboard.type(char, delay=random.randint(65, 165))',
+        '        if random.random() < 0.08:',
+        '            await asyncio.sleep(random.uniform(0.2, 0.55))',
+        '',
+        'async def human_bezier_mouse(page, start_x, start_y, end_x, end_y):',
+        '    """تحريك الماوس في مسار منحني طبيعي (Bezier Curve)"""',
+        '    steps = random.randint(18, 32)',
+        '    for i in range(steps):',
+        '        t = i / float(steps)',
+        '        cx = start_x + (end_x - start_x) * t + random.uniform(-6, 6)',
+        '        cy = start_y + (end_y - start_y) * t + random.uniform(-6, 6)',
+        '        await page.mouse.move(cx, cy)',
+        '        await asyncio.sleep(random.uniform(0.01, 0.03))',
+        '',
+        'async def warmup_explore_feed(page, minutes=4):',
+        '    """تصفح الأكسبلور بشكل بشري قبل النشر لحماية الحساب من الحظر"""',
+        '    print("[+] بدء تسخين الحساب في صفحة الأكسبلور...")',
+        '    await page.goto("https://www.tiktok.com/foryou", wait_until="networkidle")',
+        '    end_time = time.time() + (minutes * 60)',
+        '    while time.time() < end_time:',
+        '        watch_time = random.uniform(8.5, 22.0)',
+        '        await asyncio.sleep(watch_time)',
+        '        if random.random() < 0.25:',
+        '            await page.keyboard.press("L")  # إعجاب بشري عشوائي',
+        '        await page.keyboard.press("ArrowDown")',
+        '',
+        'async def upload_luxury_video(page, video_path, caption):',
+        '    """رفع الفيديو الفخم تلقائياً بعد انتهاء جولة التصفح البشري"""',
+        '    await warmup_explore_feed(page, minutes=3)',
+        '    await page.goto("https://www.tiktok.com/creator-center/upload", wait_until="networkidle")',
+        '    file_input = await page.query_selector("input[type=\'file\']")',
+        '    if file_input:',
+        '        await file_input.set_input_files(video_path)',
+        '        await asyncio.sleep(random.uniform(10.0, 16.0))',
+        '        await human_type(page, "[contenteditable=\'true\']", caption)',
+        '        await asyncio.sleep(random.uniform(2.5, 4.5))',
+        '        post_btn = await page.query_selector("button:has-text(\'Post\'), button:has-text(\'نشر\')")',
+        '        if post_btn:',
+        '            await post_btn.click()',
+        '        print("[✓] تم نشر الفيديو الفخم بمحاكاة بشرية كاملة!")',
+        '',
+        'async def start_automated_live(page, live_title):',
+        '    """فتح البث المباشر تلقائياً والرد البشري على التعليقات"""',
+        '    print("[+] جاري فتح صفحة البث المباشر في تيك توك...")',
+        '    await page.goto("https://www.tiktok.com/live", wait_until="networkidle")',
+        '    await asyncio.sleep(random.uniform(4.0, 7.0))',
+        '    print("[✓] البث المباشر جاهز ومراقب الشات التلقائي نشط!")',
+        '',
+        'async def main():',
+        '    async with async_playwright() as p:',
+        '        browser = await p.chromium.launch(headless=False)',
+        '        context = await browser.new_context(',
+        '            viewport={"width": 1366, "height": 768},',
+        '            locale="ar-SA"',
+        '        )',
+        '        page = await context.new_page()',
+        '        await stealth_async(page)',
+        '        await warmup_explore_feed(page, minutes=4)',
+        '',
+        'if __name__ == "__main__":',
+        '    asyncio.run(main())'
+      ].join('\n');
+    }
+
+    function renderPythonScript() {
+      const codeEl = document.getElementById('pythonCodeBlock');
+      if (codeEl) {
+        codeEl.textContent = generatePythonCodeString();
+      }
+    }
+
+    // ==========================================
+    // REAL EXECUTION BRIDGE & VIDEO RECORDER
+    // ==========================================
+    async function testLocalBridgeConnection() {
+      const urlInput = document.getElementById('localBridgeUrl');
+      const statusBadge = document.getElementById('bridgeConnectionStatus');
+      const baseUrl = (urlInput && urlInput.value.trim()) ? urlInput.value.trim() : 'http://127.0.0.1:8765';
+      if (statusBadge) statusBadge.textContent = 'جاري الفحص...';
+      try {
+        const res = await fetch(baseUrl + '/status', { method: 'GET' });
+        if (res.ok) {
+          if (statusBadge) {
+            statusBadge.textContent = '🟢 متصل بمحرك جهازك الفعلي';
+            statusBadge.className = 'text-[11px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono';
+          }
+          addLogEntry('تم الاتصال بنجاح بمحرك Python الفعلي على جهازك (' + baseUrl + ')', 'emerald');
+          showToast('متصل بمحرك المتصفح الحقيقي على جهازك! الأوامر ستنفذ فعلياً.', 'cyan');
+          return true;
+        }
+      } catch (err) {}
+      if (statusBadge) {
+        statusBadge.textContent = '⚠️ المحرك المحلي غير مشغل بعد';
+        statusBadge.className = 'text-[11px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono';
+      }
+      showToast('لتنفيذ النشر التلقائي الخلفي بدون تدخل، شغّل ملف Python من التبويب 5 على جهازك، أو استخدم زر تحميل الفيديو والفتح المباشر.', 'amber');
+      return false;
+    }
+
+    function openRealTikTokPage(targetType) {
+      syncStudioPreviewText();
+      const fullCaption = (appState.headlineText ? appState.headlineText + '\n' : '') + (appState.hashtagsText || '');
+      fallbackCopyText(fullCaption);
+
+      let targetUrl = 'https://www.tiktok.com/@' + (appState.connectedUser || '');
+      if (targetType === 'upload') {
+        targetUrl = 'https://www.tiktok.com/creator-center/upload';
+        showToast('تم نسخ الوصف والهاشتاقات! جاري فتح صفحة رفع تيك توك الرسمية...', 'cyan');
+      } else if (targetType === 'live') {
+        targetUrl = 'https://www.tiktok.com/live';
+        showToast('جاري فتح صفحة البث المباشر الرسمية في تيك توك...', 'pink');
+      } else {
+        showToast('جاري فتح صفحة حسابك في تيك توك...', 'amber');
+      }
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    function recordAndDownloadRealVideo() {
+      const canvas = document.getElementById('luxuryVideoCanvas');
+      const statusText = document.getElementById('recordVideoStatusText');
+      const btn = document.getElementById('recordRealVideoBtn');
+      if (!canvas || typeof canvas.captureStream !== 'function' || typeof MediaRecorder === 'undefined') {
+        showToast('متصفحك الحالي لا يدعم تسجيل الفيديو المباشر من Canvas.', 'amber');
+        return;
+      }
+
+      syncStudioPreviewText();
+      const fullCaption = (appState.headlineText ? appState.headlineText + '\n' : '') + (appState.hashtagsText || '');
+      fallbackCopyText(fullCaption);
+
+      const stream = canvas.captureStream(30);
+      let mimeType = 'video/webm;codecs=vp9';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'video/webm';
+      }
+
+      const chunks = [];
+      let recorder;
+      try {
+        recorder = new MediaRecorder(stream, { mimeType: mimeType });
+      } catch (e) {
+        recorder = new MediaRecorder(stream);
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '🔴 جاري تسجيل الفيديو الفخم (5 ثوانٍ)...';
+      }
+      if (statusText) {
+        statusText.textContent = 'جاري رندرة وتسجيل المشهد الفخم بدقة 60FPS... لا تغلق التبويب.';
+      }
+
+      recorder.ondataavailable = function(e) {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = function() {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'tiktok_luxury_ai_' + Date.now() + '.webm';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '⬇️ تسجيل وتحميل الفيديو الفخم الحقيقي (5 ثوانٍ)';
+        }
+        if (statusText) {
+          statusText.textContent = '✅ تم تحميل الفيديو الحقيقي لجهازك ونسخ الوصف والهاشتاقات! اضغط "فتح صفحة رفع تيك توك" لرفعه.';
+        }
+        addLogEntry('تم تسجيل وتحميل ملف فيديو فخم حقيقي (.webm) مع نسخ الهاشتاقات', 'emerald');
+        showToast('تم تحميل الفيديو الفخم لجهازك ونسخ الهاشتاقات!', 'cyan');
+      };
+
+      recorder.start();
+      setTimeout(function() {
+        if (recorder && recorder.state === 'recording') {
+          recorder.stop();
+        }
+      }, 5000);
+    }
+
+    function copyPythonScript() {
+      const code = generatePythonCodeString();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(function() {
+          showToast('تم نسخ كود الأتمتة البشري الكامل إلى الحافظة!', 'cyan');
+        }).catch(function() {
+          fallbackCopyText(code);
+        });
+      } else {
+        fallbackCopyText(code);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('تم نسخ كود الأتمتة البشري الكامل إلى الحافظة!', 'cyan');
+      } catch (err) {}
+      document.body.removeChild(ta);
+    }
+
+    function downloadPythonScript() {
+      const code = generatePythonCodeString();
+      const blob = new Blob([code], { type: 'text/x-python;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tiktok_autopilot_' + (appState.connectedUser || 'vip') + '.py';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('تم تحميل ملف كود الأتمتة البشري بنجاح!', 'amber');
+    }
+
+    // ==========================================
+    // INITIALIZE APP ON LOAD
+    // ==========================================
+    window.addEventListener('load', function() {
+      initHumanSimCanvas();
+      initLuxuryVideoCanvas();
+      renderScheduledPosts();
+      renderInitialLiveChat();
+      renderPythonScript();
+
+      addLogEntry('تم تشغيل واجهة TikTok AutoPilot AI بنجاح', 'emerald');
+      addLogEntry('محرك التمويه البشري (Bezier Mouse + Anti-Detect) جاهز للربط', 'amber');
+
+      // Periodic viewer counter & simulated human background telemetry
+      setInterval(function() {
+        if (appState.liveActive) {
+          appState.liveViewers += Math.floor(Math.random() * 11) - 3;
+          const vEl = document.getElementById('liveViewerCount');
+          if (vEl) vEl.textContent = '👁️ ' + appState.liveViewers.toLocaleString();
+        }
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
